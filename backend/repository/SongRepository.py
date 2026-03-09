@@ -1,5 +1,5 @@
 from typing import Optional
-import psycopg2
+import asyncpg
 from backend.domain.database.DrChordDatabase import DrChordDatabase
 from backend.domain.entities.Song import Song
 from backend.domain.utils.validation.SongValidator import SongValidator
@@ -15,28 +15,27 @@ class SongRepository(AbstractRepository):
         self.__database = database
         self.__validator = SongValidator()
 
-    def create(self, song: Song) -> Optional[Song]:
+    async def create(self, song: Song) -> Optional[Song]:
         """
         Adds a song to the database and returns the new song with its id set
         :param song: song to be created
         :return: the song created with the id set from the database
         :raises RepositoryException: if something went wrong while creating the song
         """
-        conn = validate_and_connect(self.__database, self.__validator, song, self.__class__.__name__, "Error when creating song")
+        conn = await validate_and_connect(self.__database, self.__validator, song, self.__class__.__name__, "Error when creating song")
         try:
-            with conn.cursor() as cursor:
-                cursor.execute("""INSERT INTO songs(user_id, name, genre, recording_path, date_recorded) 
-                                  VALUES (%s, %s, %s, %s, %s) RETURNING id""", (song.get_user_id(), song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date()))
-                result = cursor.fetchone()
-                conn.commit()
+            async with conn.transaction():
+                result = await conn.fetchval("""INSERT INTO songs(user_id, name, genre, recording_path, date_recorded) 
+                                      VALUES ($1, $2, $3, $4, $5) RETURNING id""", song.get_user_id(), song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date())
                 if result:
-                    song.set_id(result[0])
+                    song.set_id(result)
                     return song
-        except psycopg2.Error as e:
-            conn.rollback()
-            raise RepositoryException(self.__class__.__name__+ f": Error when creating song: {e}")
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__+ f": Database error when creating song: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__+ f": Unexpected error when creating song: {e}")
 
-    def get_by_id(self, song_id: int) -> Optional[Song]:
+    async def get_by_id(self, song_id: int) -> Optional[Song]:
         """
         Gets a song by its id from the database
         :param song_id: the id of the song to be retrieved
@@ -44,14 +43,16 @@ class SongRepository(AbstractRepository):
         :raises RepositoryException: if something went wrong while communicating with the database
         """
         try:
-            with self.__database.get_connection().cursor() as cursor:
-                cursor.execute("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated FROM songs WHERE id = %s""", (song_id,))
-                result = cursor.fetchone()
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                result = await conn.fetchrow("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated FROM songs WHERE id = $1""", song_id)
                 return Song(*result) if result else None
-        except psycopg2.Error as e:
-            raise RepositoryException(self.__class__.__name__+ f": Error when getting song by id {song_id}: {e}")
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__+ f": Database error when getting song by id {song_id}: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__+ f": Unexpected error when getting song by id {song_id}: {e}")
 
-    def get_all_paged(self, limit: int, offset: int) -> list[Song]:
+    async def get_all_paged(self, limit: int, offset: int) -> list[Song]:
         """
         Gets a set amount of songs from the database
         :param limit: the maximum amount of songs to be returned
@@ -60,15 +61,17 @@ class SongRepository(AbstractRepository):
         :raises RepositoryException: if something went wrong while communicating with the database
         """
         try:
-            with self.__database.get_connection().cursor() as cursor:
-                cursor.execute("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated 
-                                  FROM songs LIMIT %s OFFSET %s""", (limit, offset))
-                result = cursor.fetchall()
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated 
+                                  FROM songs LIMIT $1 OFFSET $2""", limit, offset)
                 return [Song(*row) for row in result]
-        except psycopg2.Error as e:
-            raise RepositoryException(self.__class__.__name__+ f": Error when getting all songs: {e}")
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__ + f": Database error when getting all songs: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when getting all songs: {e}")
 
-    def find_by_name_paged(self, name: str, limit: int, offset: int) -> list[Song]:
+    async def find_by_name_paged(self, name: str, limit: int, offset: int) -> list[Song]:
         """
         Gets a set amount of songs from the database filtered by the given name
         :param name: the name of the songs to be returned
@@ -78,49 +81,45 @@ class SongRepository(AbstractRepository):
         :raises RepositoryException: if something went wrong while communicating with the database
         """
         try:
-            with self.__database.get_connection().cursor() as cursor:
-                cursor.execute("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated 
-                                  FROM songs WHERE name LIKE %s LIMIT %s OFFSET %s""", (name, limit, offset))
-                result = cursor.fetchall()
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated 
+                                  FROM songs WHERE name LIKE $1 LIMIT $2 OFFSET $3""", f"%{name}%", limit, offset)
                 return [Song(*row) for row in result]
-        except psycopg2.Error as e:
-            raise RepositoryException(self.__class__.__name__+ f": Error when finding songs: {e}")
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__ + f": Database error when finding songs: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when finding songs: {e}")
 
-    def update(self, song: Song) -> Optional[Song]:
+    async def update(self, song: Song) -> Optional[Song]:
         """
         Updates a song's data in the database
         :param song: the new version of a song
         :return: 'None' if the song was updated successfully, the new version of the song otherwise
         :raises RepositoryException: if something went wrong while updating the song's data
         """
-        conn = validate_and_connect(self.__database, self.__validator, song, self.__class__.__name__, f"Error when updating song with id {song.get_id()}")
+        conn = await validate_and_connect(self.__database, self.__validator, song, self.__class__.__name__, f"Error when updating song with id {song.get_id()}")
         try:
-            with conn.cursor() as cursor:
-                cursor.execute("""UPDATE songs SET name = %s, genre = %s, recording_path = %s, date_recorded = %s, tabs_path = %s, date_generated = %s WHERE id = %s""",
-                               (song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date(), song.get_tabs_path(), song.get_generated_date(), song.get_id()))
-                conn.commit()
-        except psycopg2.Error:
-            conn.rollback()
-            return song
-        return None
+            async with conn.transaction():
+                status = await conn.execute("""UPDATE songs SET name = $1, genre = $2, recording_path = $3, date_recorded = $4, tabs_path = $5, date_generated = $6 WHERE id = $7""",
+                               song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date(), song.get_tabs_path(), song.get_generated_date(), song.get_id())
+                return song if status == "UPDATE 0" else None
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when updating a song: {e}")
 
-    def delete(self, song_id: int) -> Optional[Song]:
+    async def delete(self, song_id: int) -> Optional[Song]:
         """
         Deletes a song in the database
         :param song_id: the id of the song to be deleted
         :return: the deleted song if the song was deleted successfully, 'None' otherwise
         :raises RepositoryException: if something went wrong while communicating with the database
         """
-        try: conn = self.__database.get_connection()
-        except psycopg2.Error as e: raise RepositoryException(self.__class__.__name__+ f": Error when deleting song: {e}")
         try:
-            with conn.cursor() as cursor:
-                cursor.execute("""DELETE FROM songs WHERE id = %s RETURNING id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated""", (song_id,))
-                deleted = cursor.fetchone()
-                if deleted:
-                    conn.commit()
-                    return Song(*deleted)
-        except psycopg2.Error as e:
-            conn.rollback()
-            raise RepositoryException(self.__class__.__name__+ f": Error when deleting song: {e}")
-        return None
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                deleted = await conn.fetchrow("""DELETE FROM songs WHERE id = $1 RETURNING id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated""", song_id)
+                return Song(*deleted) if deleted else None
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__ + f": Database error when deleting song: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when deleting song: {e}")

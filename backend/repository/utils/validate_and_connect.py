@@ -1,4 +1,4 @@
-import psycopg2
+import asyncpg
 from backend.domain.database.DrChordDatabase import DrChordDatabase
 from backend.domain.entities.Entity import Entity
 from backend.domain.utils.validation.AbstractValidator import AbstractValidator
@@ -6,7 +6,7 @@ from backend.domain.utils.validation.ValidationException import ValidationExcept
 from backend.repository.RepositoyException import RepositoryException
 
 
-def validate_and_connect(database: DrChordDatabase, validator: AbstractValidator, entity: Entity, class_name: str, operation_failed_string: str | None = None) -> psycopg2._T_conn:
+async def validate_and_connect(database: DrChordDatabase, validator: AbstractValidator, entity: Entity, class_name: str, operation_failed_string: str | None = None) -> asyncpg.Connection:
     """
     Validate an entity and return a connection to the DrChordDatabase
     :param database: database to connect to
@@ -22,6 +22,10 @@ def validate_and_connect(database: DrChordDatabase, validator: AbstractValidator
     except ValidationException as ve:
         raise RepositoryException(class_name + ": " + str(ve))
     try:
-        return database.get_connection()
-    except psycopg2.Error as e:
-        raise RepositoryException(class_name + ": " + operation_failed_string + f": {e}")
+        return await database.get_connection()
+    except asyncpg.PostgresError as e:
+        msg = operation_failed_string if operation_failed_string else "Database error"
+        raise RepositoryException(class_name + ": " + msg + f": {e}")
+    except Exception as e:
+        msg = operation_failed_string if operation_failed_string else "Unexpected error"
+        raise RepositoryException(class_name + ": " + msg + f": {e}")

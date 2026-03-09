@@ -1,4 +1,4 @@
-import logging, psycopg2
+import logging, asyncpg, psycopg2
 from psycopg2 import sql
 from backend.domain.database.utils.db_config import config
 
@@ -54,9 +54,13 @@ class DrChordDatabase:
 
     def __del__(self): self.__disconnect()
 
-    def __connect(self):
-        logging.info("Connecting to the database...")
+    def __connect_synced(self):
+        logging.info("Connecting to the database for creation...")
         self.__connection = psycopg2.connect(**self.__connection_params)
+
+    async def __connect(self):
+        logging.info("Connecting a client to the database...")
+        self.__connection = asyncpg.connect(**self.__connection_params)
 
     def __disconnect(self):
         logging.info("Disconnecting from the database...")
@@ -79,12 +83,12 @@ class DrChordDatabase:
         """
         self.__version = version
 
-    def get_connection(self) -> psycopg2._T_conn:
+    async def get_connection(self) -> asyncpg.Connection:
         """
         Gets the connection to the database if it already exists, otherwise creates it and returns it
         :return: The connection to the database
         """
-        if self.__connection is None: self.__connect()
+        if self.__connection is None: await self.__connect()
         return self.__connection
 
     def delete(self):
@@ -95,14 +99,14 @@ class DrChordDatabase:
         self.__version = 1
         _drop_db_force(self.__connection_params["database"], self.__connection_params["user"], self.__connection_params["password"])
 
-    def create(self): #TODO
+    def create(self):
         """
         Create DRChord database, if it doesn't exist
         :return: None
         """
         self.__version = 1
         _create_db_if_not_exists(self.__connection_params["database"], self.__connection_params["user"], self.__connection_params["password"])
-        self.__connect()
+        self.__connect_synced()
         self.__connection.autocommit = True
         cursor = self.__connection.cursor()
         cursor.execute("""
@@ -112,7 +116,7 @@ class DrChordDatabase:
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 date_joined TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )
+            );
             
             CREATE TABLE IF NOT EXISTS songs (
                 id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -123,17 +127,17 @@ class DrChordDatabase:
                 date_recorded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 tabs_path TEXT,
                 date_generated TIMESTAMP,
-            )
+            );
             
-            ALTER TABLE songs ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id)
+            ALTER TABLE songs ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id);
             
-            CREATE INDEX idx_users_email ON users (email)
-            CREATE INDEX idx_songs_user_id_and_generated_date ON songs(user_id, date_generated)
-            CREATE INDEX idx_songs_user_id_and_recorded_date ON songs(user_id, date_recorded)
-            CREATE INDEX idx_songs_user_id_and_name ON songs(user_id, name)
-            CREATE INDEX idx_songs_user_id_and_genre ON songs(user_id, genre)
-            CREATE INDEX idx_songs_recording_path ON songs(recording_path)
-            CREATE INDEX idx_songs_tabs_path ON songs(tabs_path)
+            CREATE INDEX idx_users_email ON users (email);
+            CREATE INDEX idx_songs_user_id_and_generated_date ON songs(user_id, date_generated);
+            CREATE INDEX idx_songs_user_id_and_recorded_date ON songs(user_id, date_recorded);
+            CREATE INDEX idx_songs_user_id_and_name ON songs(user_id, name);
+            CREATE INDEX idx_songs_user_id_and_genre ON songs(user_id, genre);
+            CREATE INDEX idx_songs_recording_path ON songs(recording_path);
+            CREATE INDEX idx_songs_tabs_path ON songs(tabs_path);
         """)
 
         logging.info(f"Created desired schema inside database '{self.__connection_params['database']}'")
