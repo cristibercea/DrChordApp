@@ -2,7 +2,7 @@ import logging, asyncpg, psycopg2
 from psycopg2 import sql
 from backend.domain.database.utils.db_config import config
 
-def _create_db_if_not_exists(db_name, user, password, host="localhost"):
+def _create_db_if_not_exists(db_name, user, password, host="localhost") -> None:
     """
     Create a new PostgreSQL DB with a given name
     """
@@ -18,7 +18,7 @@ def _create_db_if_not_exists(db_name, user, password, host="localhost"):
     cur.close()
     conn.close()
 
-def _drop_db_force(db_name, user, password, host="localhost"):
+def _drop_db_force(db_name, user, password, host="localhost") -> None:
     """
     Close any connection to the given PostgreSQL DB and drop it
     """
@@ -52,31 +52,24 @@ class DrChordDatabase:
         self.__version = 1
         self.__connection = None
 
-    def __del__(self): self.__disconnect()
-
-    def __connect_synced(self):
-        logging.info("Connecting to the database for creation...")
-        self.__connection = psycopg2.connect(**self.__connection_params)
-
-    async def __connect(self):
+    async def __connect(self) -> None:
         logging.info("Connecting a client to the database...")
-        self.__connection = asyncpg.connect(**self.__connection_params)
+        self.__connection = await asyncpg.connect(**self.__connection_params)
 
-    def __disconnect(self):
+    async def disconnect(self) -> None:
         logging.info("Disconnecting from the database...")
-        self.__connection.close() if self.__connection is not None else None
+        await self.__connection.close() if self.__connection else None
         self.__connection_params = None
         self.__connection = None
-        self.__cursor = None
 
-    def get_version(self):
+    def get_version(self) -> int:
         """
         Gets the version of DRChord database
         :return: database version
         """
         return self.__version
 
-    def set_version(self, version: int):
+    def set_version(self, version: int) -> None:
         """
         Set the version of the database
         :param version: version of the database
@@ -91,7 +84,7 @@ class DrChordDatabase:
         if self.__connection is None: await self.__connect()
         return self.__connection
 
-    def delete(self):
+    def delete(self) -> None:
         """
         Delete DRChord database and clean any dependencies
         :return: None
@@ -99,46 +92,51 @@ class DrChordDatabase:
         self.__version = 1
         _drop_db_force(self.__connection_params["database"], self.__connection_params["user"], self.__connection_params["password"])
 
-    def create(self):
+    def create(self) -> None:
         """
         Create DRChord database, if it doesn't exist
         :return: None
         """
-        self.__version = 1
-        _create_db_if_not_exists(self.__connection_params["database"], self.__connection_params["user"], self.__connection_params["password"])
-        self.__connect_synced()
-        self.__connection.autocommit = True
-        cursor = self.__connection.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
-                date_joined TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-            
-            CREATE TABLE IF NOT EXISTS songs (
-                id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                user_id BIGINT NOT NULL,
-                name TEXT NOT NULL,
-                genre TEXT NOT NULL,
-                recording_path TEXT NOT NULL,
-                date_recorded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                tabs_path TEXT,
-                date_generated TIMESTAMP,
-            );
-            
-            ALTER TABLE songs ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id);
-            
-            CREATE INDEX idx_users_email ON users (email);
-            CREATE INDEX idx_songs_user_id_and_generated_date ON songs(user_id, date_generated);
-            CREATE INDEX idx_songs_user_id_and_recorded_date ON songs(user_id, date_recorded);
-            CREATE INDEX idx_songs_user_id_and_name ON songs(user_id, name);
-            CREATE INDEX idx_songs_user_id_and_genre ON songs(user_id, genre);
-            CREATE INDEX idx_songs_recording_path ON songs(recording_path);
-            CREATE INDEX idx_songs_tabs_path ON songs(tabs_path);
-        """)
+        try:
+            self.__version = 1
+            _create_db_if_not_exists(self.__connection_params["database"], self.__connection_params["user"], self.__connection_params["password"])
 
-        logging.info(f"Created desired schema inside database '{self.__connection_params['database']}'")
-        self.__connection.autocommit = False
+            logging.info("Connecting to the database for creation (synced)...")
+            connection = psycopg2.connect(**self.__connection_params)
+            connection.autocommit = True
+            cursor = connection.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    password TEXT NOT NULL,
+                    date_joined TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                
+                CREATE TABLE IF NOT EXISTS songs (
+                    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                    user_id BIGINT NOT NULL REFERENCES users(id),
+                    name TEXT NOT NULL,
+                    genre TEXT NOT NULL,
+                    recording_path TEXT NOT NULL,
+                    date_recorded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    tabs_path TEXT,
+                    date_generated TIMESTAMP,
+                );
+                
+                CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+                CREATE INDEX IF NOT EXISTS idx_songs_user_id_and_generated_date ON songs(user_id, date_generated);
+                CREATE INDEX IF NOT EXISTS idx_songs_user_id_and_recorded_date ON songs(user_id, date_recorded);
+                CREATE INDEX IF NOT EXISTS idx_songs_user_id_and_name ON songs(user_id, name);
+                CREATE INDEX IF NOT EXISTS idx_songs_user_id_and_genre ON songs(user_id, genre);
+                CREATE INDEX IF NOT EXISTS idx_songs_recording_path ON songs(recording_path);
+                CREATE INDEX IF NOT EXISTS idx_songs_tabs_path ON songs(tabs_path);
+            """)
+
+            logging.info(f"Created desired schema inside database '{self.__connection_params['database']}'")
+            connection.autocommit = False
+            logging.info("Disconnecting from the database (synced)...")
+            connection.close()
+        except psycopg2.Error as e:
+            logging.fatal(f"{self.__class__.__name__}: Failed to connect to database '{self.__connection_params['database']}': {e}")
