@@ -1,12 +1,13 @@
 import logging
-
+import asyncio
 from backend.domain.database.DrChordDatabase import DrChordDatabase
 
 def run():
     try:
         db = DrChordDatabase("../../../database.ini")
         db.create()
-        print("all ok") if db.get_connection() is not None else print("connection failed")
+        conn = asyncio.run(db.get_connection())
+        print("all ok") if conn is not None and not conn.is_closed() else print("connection failed")
         db.delete()
     except Exception as e: print(e)
 

@@ -122,7 +122,7 @@ class DrChordDatabase:
                     recording_path TEXT NOT NULL,
                     date_recorded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     tabs_path TEXT,
-                    date_generated TIMESTAMP,
+                    date_generated TIMESTAMP
                 );
                 
                 CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
