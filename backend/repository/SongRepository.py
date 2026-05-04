@@ -25,8 +25,8 @@ class SongRepository(AbstractRepository):
         conn = await validate_and_connect(self.__database, self.__validator, song, self.__class__.__name__, "Error when creating song")
         try:
             async with conn.transaction():
-                result = await conn.fetchval("""INSERT INTO songs(user_id, name, genre, recording_path, date_recorded) 
-                                      VALUES ($1, $2, $3, $4, $5) RETURNING id""", song.get_user_id(), song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date())
+                result = await conn.fetchval("""INSERT INTO songs(user_id, name, genre, recording_path, date_recorded, midi_path, midi_date) 
+                                      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id""", song.get_user_id(), song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date(), song.get_midi_path(), song.get_midi_date())
                 if result:
                     song.set_id(result)
                     return song
@@ -45,7 +45,7 @@ class SongRepository(AbstractRepository):
         try:
             conn = await self.__database.get_connection()
             async with conn.transaction():
-                result = await conn.fetchrow("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated FROM songs WHERE id = $1""", song_id)
+                result = await conn.fetchrow("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date FROM songs WHERE id = $1""", song_id)
                 return Song(*result) if result else None
         except asyncpg.PostgresError as e:
             raise RepositoryException(self.__class__.__name__+ f": Database error when getting song by id {song_id}: {e}")
@@ -63,7 +63,7 @@ class SongRepository(AbstractRepository):
         try:
             conn = await self.__database.get_connection()
             async with conn.transaction():
-                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated 
+                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date 
                                   FROM songs LIMIT $1 OFFSET $2""", limit, offset)
                 return [Song(*row) for row in result]
         except asyncpg.PostgresError as e:
@@ -83,7 +83,7 @@ class SongRepository(AbstractRepository):
         try:
             conn = await self.__database.get_connection()
             async with conn.transaction():
-                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated 
+                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date 
                                   FROM songs WHERE name LIKE $1 LIMIT $2 OFFSET $3""", f"%{name}%", limit, offset)
                 return [Song(*row) for row in result]
         except asyncpg.PostgresError as e:
@@ -101,8 +101,8 @@ class SongRepository(AbstractRepository):
         conn = await validate_and_connect(self.__database, self.__validator, song, self.__class__.__name__, f"Error when updating song with id {song.get_id()}")
         try:
             async with conn.transaction():
-                status = await conn.execute("""UPDATE songs SET name = $1, genre = $2, recording_path = $3, date_recorded = $4, tabs_path = $5, date_generated = $6 WHERE id = $7""",
-                               song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date(), song.get_tabs_path(), song.get_generated_date(), song.get_id())
+                status = await conn.execute("""UPDATE songs SET name = $1, genre = $2, recording_path = $3, date_recorded = $4, tabs_path = $5, date_generated = $6, midi_path = $7, midi_date = $8 WHERE id = $9""",
+                               song.get_name(), song.get_genre(), song.get_recording_path(), song.get_recording_date(), song.get_tabs_path(), song.get_generated_date(), song.get_midi_path(), song.get_midi_date(), song.get_id())
                 return song if status == "UPDATE 0" else None
         except Exception as e:
             raise RepositoryException(self.__class__.__name__ + f": Unexpected error when updating a song: {e}")
@@ -117,7 +117,7 @@ class SongRepository(AbstractRepository):
         try:
             conn = await self.__database.get_connection()
             async with conn.transaction():
-                deleted = await conn.fetchrow("""DELETE FROM songs WHERE id = $1 RETURNING id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated""", song_id)
+                deleted = await conn.fetchrow("""DELETE FROM songs WHERE id = $1 RETURNING id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date""", song_id)
                 return Song(*deleted) if deleted else None
         except asyncpg.PostgresError as e:
             raise RepositoryException(self.__class__.__name__ + f": Database error when deleting song: {e}")

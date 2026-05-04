@@ -21,6 +21,9 @@ class SongValidator(AbstractValidator):
         if (song.get_generated_date() is None and song.get_tabs_path() is not None) or \
                 (song.get_tabs_path() is None and song.get_generated_date() is not None):
             errors.append("The Song's tabs generation is invalid")
+        if (song.get_midi_date() is None and song.get_midi_path() is not None) or \
+                (song.get_midi_path() is None and song.get_midi_date() is not None):
+            errors.append("The Song's midi generation is invalid")
 
         if errors:
             logging.warning(f"Invalid Song: {errors}")
@@ -35,10 +38,12 @@ class SongValidator(AbstractValidator):
             errors.append("The Song's recording path does not exist on the server")
         if song.get_recording_date() >= datetime.now(timezone.utc):
             errors.append("The Song's recording date can not be in the future")
-        if song.get_tabs_path().strip() and not os.path.isfile(song.get_tabs_path()):
+        if song.get_tabs_path() and not os.path.isfile(song.get_tabs_path().strip()):
             errors.append("The Song's tabs path does not exist on the server")
         if song.get_generated_date() and song.get_generated_date() >= datetime.now(timezone.utc):
             errors.append("The Song's tabs generation date can not be in the future")
+        if song.get_midi_date() and song.get_midi_date() >= datetime.now(timezone.utc):
+            errors.append("The Song's midi generation date can not be in the future")
 
         if errors:
             logging.warning(f"Invalid Song: {errors}")

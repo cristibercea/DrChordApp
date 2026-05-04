@@ -1,0 +1,1 @@
+class ServiceException(RuntimeError): pass

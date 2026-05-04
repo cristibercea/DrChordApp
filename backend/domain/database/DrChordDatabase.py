@@ -1,6 +1,6 @@
 import logging, asyncpg, psycopg2
 from psycopg2 import sql
-from backend.domain.database.utils.db_config import config
+from backend.config_reader import config
 
 def _create_db_if_not_exists(db_name, user, password, host="localhost") -> None:
     """
@@ -122,7 +122,9 @@ class DrChordDatabase:
                     recording_path TEXT NOT NULL,
                     date_recorded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     tabs_path TEXT,
-                    date_generated TIMESTAMP
+                    date_generated TIMESTAMP,
+                    midi_path TEXT,
+                    midi_date TIMESTAMP
                 );
                 
                 CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);

@@ -10,8 +10,10 @@ class Song(Entity):
     __recording_date: datetime
     __tabs_path: str | None
     __generated_date: datetime | None
+    __midi_path: str | None
+    __midi_date: datetime | None
 
-    def __init__(self, sid: int, user_id: int, name: str, genre: str, recording_path: str, recording_date: datetime, tabs_path: str | None = None, generated_date: datetime | None = None):
+    def __init__(self, sid: int, user_id: int, name: str, genre: str, recording_path: str, recording_date: datetime, tabs_path: str | None = None, generated_date: datetime | None = None, midi_path: str | None = None, midi_date: datetime | None = None):
         self.__id = sid
         self.__user_id = user_id
         self.__name = name
@@ -20,6 +22,8 @@ class Song(Entity):
         self.__recording_date = recording_date
         self.__tabs_path = tabs_path
         self.__generated_date = generated_date
+        self.__midi_path = midi_path
+        self.__midi_date = midi_date
 
     def get_id(self) -> int: return self.__id
     def get_user_id(self) -> int: return self.__user_id
@@ -29,11 +33,15 @@ class Song(Entity):
     def get_recording_date(self) -> datetime: return self.__recording_date
     def get_tabs_path(self) -> str | None: return self.__tabs_path
     def get_generated_date(self) -> datetime | None: return self.__generated_date
+    def get_midi_path(self) -> str | None: return self.__midi_path
+    def get_midi_date(self) -> datetime | None: return self.__midi_date
 
     def set_id(self, new_id: int) -> None: self.__id = new_id
     def set_name(self, new_name: str) -> None: self.__name = new_name
     def set_genre(self, new_genre: str) -> None: self.__genre = new_genre
     def set_tabs_path(self, new_tabs_path: str) -> None: self.__tabs_path = new_tabs_path
     def set_generated_date(self, new_generated_date: datetime) -> None: self.__generated_date = new_generated_date
+    def set_midi_path(self, new_midi_path: str) -> None: self.__midi_path = new_midi_path
+    def set_midi_date(self, new_midi_date) -> None: self.__midi_date = new_midi_date
 
-    def __str__(self) -> str: return f'Song {self.__id}: [Name: {self.__name} | Genre: {self.__genre} | Recorded on: {self.__recording_date} | Tabs Generated: {"yes" if self.__generated_date else "no"}]'
+    def __str__(self) -> str: return f'Song {self.__id}: [Name: {self.__name} | Genre: {self.__genre} | Recorded on: {self.__recording_date} | MIDI Generated: {"yes" if self.__midi_date else "no"}]'
