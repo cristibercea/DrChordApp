@@ -1,6 +1,6 @@
 import logging, asyncpg, psycopg2
 from psycopg2 import sql
-from backend.config_reader import config
+from utils.config_reader import config
 
 def _create_db_if_not_exists(db_name, user, password, host="localhost") -> None:
     """

@@ -28,7 +28,7 @@ class UserValidator(AbstractValidator):
         nameValidator = NameValidator()
         try: nameValidator.validate(user.get_name())
         except ValidationException as e: errors.append(e.__str__())
-        if user.get_date_joined() >= datetime.now(timezone.utc):
+        if user.get_date_joined() > datetime.now():
             errors.append("The User's register date can not be in the future")
 
         if errors:

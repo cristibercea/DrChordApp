@@ -34,15 +34,11 @@ class SongValidator(AbstractValidator):
         except ValidationException as e: errors.append(e.__str__())
         try: nameValidator.validate(song.get_genre())
         except ValidationException as e: errors.append(e.__str__())
-        if not os.path.isfile(song.get_recording_path()):
-            errors.append("The Song's recording path does not exist on the server")
-        if song.get_recording_date() >= datetime.now(timezone.utc):
+        if song.get_recording_date() > datetime.now():
             errors.append("The Song's recording date can not be in the future")
-        if song.get_tabs_path() and not os.path.isfile(song.get_tabs_path().strip()):
-            errors.append("The Song's tabs path does not exist on the server")
-        if song.get_generated_date() and song.get_generated_date() >= datetime.now(timezone.utc):
+        if song.get_generated_date() and song.get_generated_date() > datetime.now():
             errors.append("The Song's tabs generation date can not be in the future")
-        if song.get_midi_date() and song.get_midi_date() >= datetime.now(timezone.utc):
+        if song.get_midi_date() and song.get_midi_date() > datetime.now():
             errors.append("The Song's midi generation date can not be in the future")
 
         if errors:
