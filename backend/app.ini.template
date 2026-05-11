@@ -1,0 +1,23 @@
+#COMMENT# this is a generic app.ini setup for DrChord App
+[postgresql]
+host=<host_ip>
+user=<postgresql_username>
+password=<postgresql_password>
+database=<postgresql_database>
+
+[security]
+algorithm=<JWT_encoding_algorythm>
+secret=<secret_key>  #COMMENT# a random string
+access_token_expire_mins=<number_of_minutes_until_token_expiration>
+
+[email]
+#COMMENT# DrChord typically uses a basic Google Mail setup (for other providers you need to modify accordingly)
+username=<example@gmail.com>
+password=<google_apps_generated_passkey> #COMMENT# this is obtained from Google Account > settings > App passwords
+from=<example2@gmail.com>
+port=<smtp_server_port> #COMMENT# usually: 587
+server=<smtp_server_ip> #COMMENT# for google mail: smtp.gmail.com
+starttls=<bool>         #COMMENT# if true, encrypts the connection after handshake
+ssl_tls=<bool>          #COMMENT# if false, the secure connection is not encrypted from the start of communication
+use_credentials=<bool>  #COMMENT# if true, it is mandatory for DrChord server to register to Google before each email
+validate_certs=<bool>   #COMMENT# if true, the smtp server certificates are verified by DrChord backend, before connection (avoids Man-in-the-Middle)

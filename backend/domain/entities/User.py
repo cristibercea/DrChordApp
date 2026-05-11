@@ -3,20 +3,20 @@ from backend.domain.entities.Entity import Entity
 
 
 class User(Entity):
-    __id: int
+    __id: int | None
     __name: str
     __email: str
     __password: str
     __date_joined: datetime
 
-    def __init__(self, uid: int, name: str, email: str, password: str, date_joined: datetime):
+    def __init__(self, uid: int | None, name: str, email: str, password: str, date_joined: datetime):
         self.__id = uid
         self.__name = name
         self.__email = email
         self.__password = password
         self.__date_joined = date_joined
 
-    def get_id(self) -> int: return self.__id
+    def get_id(self) -> int | None: return self.__id
     def get_name(self) -> str: return self.__name
     def get_email(self) -> str: return self.__email
     def get_password(self) -> str: return self.__password

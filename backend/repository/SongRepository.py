@@ -15,6 +15,90 @@ class SongRepository(AbstractRepository):
         self.__database = database
         self.__validator = SongValidator()
 
+    async def get_by_id(self, song_id: int) -> Optional[Song]:
+        """
+        Gets a song by its id from the database
+        :param song_id: the id of the song to be retrieved
+        :return: the song with the given id
+        :raises RepositoryException: if something went wrong while communicating with the database
+        """
+        try:
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                result = await conn.fetchrow("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date FROM songs WHERE id = $1""", song_id)
+                return Song(*result) if result else None
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__+ f": Database error when getting song by id {song_id}: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__+ f": Unexpected error when getting song by id {song_id}: {e}")
+
+    async def get_all_paged_by_user_id(self, user_id: int, limit: int, offset: int) -> list[Song]:
+        """
+        Gets a set amount of songs from the database
+        :param user_id: the id of the user whose songs to be retrieved
+        :param limit: the maximum amount of songs to be returned
+        :param offset: the start offset of the songs to be returned
+        :return: a list of maximum <limit> songs starting from <offset>
+        :raises RepositoryException: if something went wrong while communicating with the database
+        """
+        try:
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date 
+                                  FROM songs WHERE user_id = $1 LIMIT $2 OFFSET $3""", user_id, limit, offset)
+                return [Song(*row) for row in result]
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__ + f": Database error when getting all songs: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when getting all songs: {e}")
+
+    async def find_paged_filtered(self, user_id: int, search: str, genre: str, hasTab: str, sortBy: str, limit: int, offset: int) -> list[Song]:
+        """
+        Finds songs filtered by the given parameters
+        :param user_id: user id
+        :param search: name search string
+        :param genre: song genre
+        :param hasTab: 'hasTabs' if the song has generated tabs
+        :param sortBy: category by wich the sort will be made
+        :param limit: the maximum amount of songs to be returned
+        :param offset: the start offset of the songs to be returned
+        :return: a filtered and/or ordered list of songs
+        """
+        try:
+            conn = await self.__database.get_connection()
+            async with conn.transaction():
+                query = """SELECT id,user_id,name,genre,recording_path,date_recorded,tabs_path,date_generated,midi_path,midi_date
+                        FROM songs WHERE user_id = $1"""
+                params = [user_id]
+                param_index = 2  # Next parameter number
+                # filter: search by name (optional)
+                if search:
+                    query += f" AND name ILIKE ${param_index}"
+                    params.append(f"%{search}%")
+                    param_index += 1
+                # filter: genre (optional)
+                if genre:
+                    query += f" AND genre ILIKE ${param_index}"
+                    params.append(f"%{genre}%")
+                    param_index += 1
+                # filter: has tabs or not (optional)
+                if hasTab == "yes": query += " AND tabs_path IS NOT NULL"
+                elif hasTab == "no": query += " AND tabs_path IS NULL"
+                # sort types (optional)
+                if sortBy == "name_asc": query += " ORDER BY name ASC"
+                elif sortBy == "name_desc": query += " ORDER BY name DESC"
+                elif sortBy == "date_asc": query += " ORDER BY date_recorded ASC"
+                else: query += " ORDER BY date_recorded DESC"  # Default
+
+                query += f" LIMIT ${param_index} OFFSET ${param_index + 1}"
+                params.extend([limit, offset])
+                return [Song(*row) for row in await conn.fetch(query, *params)]
+
+        except asyncpg.PostgresError as e:
+            raise RepositoryException(self.__class__.__name__ + f": Database error when finding songs: {e}")
+        except Exception as e:
+            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when finding songs: {e}")
+
     async def create(self, song: Song) -> Optional[Song]:
         """
         Adds a song to the database and returns the new song with its id set
@@ -34,62 +118,6 @@ class SongRepository(AbstractRepository):
             raise RepositoryException(self.__class__.__name__+ f": Database error when creating song: {e}")
         except Exception as e:
             raise RepositoryException(self.__class__.__name__+ f": Unexpected error when creating song: {e}")
-
-    async def get_by_id(self, song_id: int) -> Optional[Song]:
-        """
-        Gets a song by its id from the database
-        :param song_id: the id of the song to be retrieved
-        :return: the song with the given id
-        :raises RepositoryException: if something went wrong while communicating with the database
-        """
-        try:
-            conn = await self.__database.get_connection()
-            async with conn.transaction():
-                result = await conn.fetchrow("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date FROM songs WHERE id = $1""", song_id)
-                return Song(*result) if result else None
-        except asyncpg.PostgresError as e:
-            raise RepositoryException(self.__class__.__name__+ f": Database error when getting song by id {song_id}: {e}")
-        except Exception as e:
-            raise RepositoryException(self.__class__.__name__+ f": Unexpected error when getting song by id {song_id}: {e}")
-
-    async def get_all_paged(self, limit: int, offset: int) -> list[Song]:
-        """
-        Gets a set amount of songs from the database
-        :param limit: the maximum amount of songs to be returned
-        :param offset: the start offset of the songs to be returned
-        :return: a list of maximum <limit> songs starting from <offset>
-        :raises RepositoryException: if something went wrong while communicating with the database
-        """
-        try:
-            conn = await self.__database.get_connection()
-            async with conn.transaction():
-                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date 
-                                  FROM songs LIMIT $1 OFFSET $2""", limit, offset)
-                return [Song(*row) for row in result]
-        except asyncpg.PostgresError as e:
-            raise RepositoryException(self.__class__.__name__ + f": Database error when getting all songs: {e}")
-        except Exception as e:
-            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when getting all songs: {e}")
-
-    async def find_by_name_paged(self, name: str, limit: int, offset: int) -> list[Song]:
-        """
-        Gets a set amount of songs from the database filtered by the given name
-        :param name: the name of the songs to be returned
-        :param limit: the maximum amount of songs to be returned
-        :param offset: the start offset of the songs to be returned
-        :return: a list of maximum <limit> songs starting from <offset> and having a certain name
-        :raises RepositoryException: if something went wrong while communicating with the database
-        """
-        try:
-            conn = await self.__database.get_connection()
-            async with conn.transaction():
-                result = await conn.fetch("""SELECT id, user_id, name, genre, recording_path, date_recorded, tabs_path, date_generated, midi_path, midi_date 
-                                  FROM songs WHERE name LIKE $1 LIMIT $2 OFFSET $3""", f"%{name}%", limit, offset)
-                return [Song(*row) for row in result]
-        except asyncpg.PostgresError as e:
-            raise RepositoryException(self.__class__.__name__ + f": Database error when finding songs: {e}")
-        except Exception as e:
-            raise RepositoryException(self.__class__.__name__ + f": Unexpected error when finding songs: {e}")
 
     async def update(self, song: Song) -> Optional[Song]:
         """
