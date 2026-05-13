@@ -5,6 +5,7 @@ from backend.domain.utils.validation.ValidationException import ValidationExcept
 
 
 class NameValidator(AbstractValidator):
+    """Name Validator class"""
     def validate(self, name: str):
         logging.info(f"Validating Name: {name}")
         for c in name:

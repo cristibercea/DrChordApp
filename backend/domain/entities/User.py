@@ -3,6 +3,7 @@ from backend.domain.entities.Entity import Entity
 
 
 class User(Entity):
+    """The main User entity class."""
     __id: int | None
     __name: str
     __email: str

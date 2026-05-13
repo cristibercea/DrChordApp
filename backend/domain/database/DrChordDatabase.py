@@ -5,6 +5,11 @@ from utils.config_reader import config
 def _create_db_if_not_exists(db_name, user, password, host="localhost") -> None:
     """
     Create a new PostgreSQL DB with a given name
+    :param db_name: name of the database
+    :param user: name of the DB user
+    :param password: user password
+    :param host: name of the host
+    :return: None
     """
     conn = psycopg2.connect(dbname="postgres",user=user,password=password,host=host)
     conn.autocommit = True
@@ -21,6 +26,11 @@ def _create_db_if_not_exists(db_name, user, password, host="localhost") -> None:
 def _drop_db_force(db_name, user, password, host="localhost") -> None:
     """
     Close any connection to the given PostgreSQL DB and drop it
+    :param db_name: name of the database
+    :param user: name of the DB user
+    :param password: user password
+    :param host: name of the host
+    :return: None
     """
     conn = psycopg2.connect(dbname="postgres", user=user, password=password, host=host)
     conn.autocommit = True
@@ -45,18 +55,29 @@ class DrChordDatabase:
     creates and retrieves database connections and offers versioning.
     """
     def __init__(self, db_config_file_path: str | None = None):
+        """
+        :param db_config_file_path: the path to the app or database .ini config file
+        """
         try: self.__connection_params = config(filename=db_config_file_path)
-        except FileNotFoundError as e:
+        except FileNotFoundError | RuntimeError as e:
             logging.fatal(e)
             exit(1)
         self.__version = 1
         self.__connection = None
 
     async def __connect(self) -> None:
+        """
+        Connect to the DRChord database
+        :return: None
+        """
         logging.info("Connecting a client to the database...")
         self.__connection = await asyncpg.connect(**self.__connection_params)
 
     async def disconnect(self) -> None:
+        """
+        Disconnect from the DRChord database
+        :return: None
+        """
         logging.info("Disconnecting from the database...")
         await self.__connection.close() if self.__connection else None
         self.__connection_params = None
@@ -73,6 +94,7 @@ class DrChordDatabase:
         """
         Set the version of the database
         :param version: version of the database
+        :return: None
         """
         self.__version = version
 

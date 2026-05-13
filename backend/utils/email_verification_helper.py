@@ -1,6 +1,8 @@
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
+import logging
 from pydantic import SecretStr
 from backend.utils.config_reader import config
+from backend.service.utils.ServiceException import ServiceException
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 
 async def send_verification_code_email(email: str, code: str) -> None:
     """
@@ -9,6 +11,7 @@ async def send_verification_code_email(email: str, code: str) -> None:
     :param code: account verification code
     :return: None
     """
+    logging.info(f"Configuring verification code email for {email}...")
     html_content = f"""
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
         <h2>Welcome to DrChord!</h2>
@@ -26,17 +29,24 @@ async def send_verification_code_email(email: str, code: str) -> None:
         subtype=MessageType.html
     )
     is_true = lambda val: str(val).strip().lower() in ('true', '1', 'yes', 'on')
-    email_config = config(section='email')
-    await FastMail(
-        ConnectionConfig(
-            MAIL_USERNAME = str(email_config['username']),
-            MAIL_PASSWORD = SecretStr(str(email_config['password'])),
-            MAIL_FROM = str(email_config['from']),
-            MAIL_PORT = int(str(email_config['port'])),
-            MAIL_SERVER = str(email_config['server']),
-            MAIL_STARTTLS = is_true(email_config['starttls']),
-            MAIL_SSL_TLS = is_true(email_config['ssl_tls']),
-            USE_CREDENTIALS = is_true(email_config['use_credentials']),
-            VALIDATE_CERTS = is_true(email_config['validate_certs']),
-        )
-    ).send_message(message)
+    try:
+        logging.info(f"Creating verification code email for {email}...")
+        email_config = config(section='email')
+        logging.info(f'Sending verification code email to {email}...')
+        await FastMail(
+            ConnectionConfig(
+                MAIL_USERNAME = str(email_config['username']),
+                MAIL_PASSWORD = SecretStr(str(email_config['password'])),
+                MAIL_FROM = str(email_config['from']),
+                MAIL_PORT = int(str(email_config['port'])),
+                MAIL_SERVER = str(email_config['server']),
+                MAIL_STARTTLS = is_true(email_config['starttls']),
+                MAIL_SSL_TLS = is_true(email_config['ssl_tls']),
+                USE_CREDENTIALS = is_true(email_config['use_credentials']),
+                VALIDATE_CERTS = is_true(email_config['validate_certs']),
+            )
+        ).send_message(message)
+        logging.info(f"Verification code email sent to {email}.")
+    except FileNotFoundError | RuntimeError as e:
+        logging.fatal(e)
+        raise ServiceException(e)

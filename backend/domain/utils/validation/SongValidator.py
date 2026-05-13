@@ -7,6 +7,7 @@ from backend.domain.utils.validation.ValidationException import ValidationExcept
 
 
 class SongValidator(AbstractValidator):
+    """Song entity Validator class"""
     def validate(self, song: Song):
         logging.info(f"Validating Song: {song}")
         if song is None:

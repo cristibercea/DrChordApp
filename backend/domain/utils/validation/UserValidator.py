@@ -8,6 +8,7 @@ from backend.domain.utils.validation.ValidationException import ValidationExcept
 
 
 class UserValidator(AbstractValidator):
+    """User entity Validator class"""
     def validate(self, user: User):
         logging.info(f"Validating User: {user}")
         if user is None:

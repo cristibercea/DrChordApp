@@ -1,9 +1,7 @@
-import pretty_midi, numpy as np
+import pretty_midi, logging
+from pathlib import Path
 from tuttut.logic.tab import Tab
 from tuttut.logic.theory import Tuning
-from pathlib import Path
-np.seterr(divide="ignore")
-
 
 def format_tabs_file(file_path: Path, measures_per_row: int = 4) -> None:
     """
@@ -12,9 +10,13 @@ def format_tabs_file(file_path: Path, measures_per_row: int = 4) -> None:
     :param measures_per_row: number of measures per row
     :return: None
     """
+    logging.info("Reading tab file.")
     with open(file_path, 'r', encoding='utf-8') as f: lines = [line.strip() for line in f.readlines()]
     tab_lines = [line for line in lines if '|' in line and len(line) > 10]
-    if not tab_lines: return
+    if not tab_lines:
+        logging.warning("No tabs found.")
+        return
+    logging.info("Processing tabs.")
     line0 = tab_lines[0] #High E sting; we use it for measure bar finding
     pipe_indices = [i for i, c in enumerate(line0) if c == '|']
 
@@ -54,21 +56,23 @@ def format_tabs_file(file_path: Path, measures_per_row: int = 4) -> None:
         formatted_blocks.append("\n".join(block))
         prev_cut = cut
 
-    # Mark the last tab griff with '||||' instead of a single '|'
-    last_block = [line.strip()+'|||' for line in formatted_blocks[-1].split('\n')]
+    # Mark the last tab griff with '||' instead of a single '|'
+    last_block = [line.strip()+'|' for line in formatted_blocks[-1].split('\n')]
     formatted_blocks[-1] = "\n".join(last_block)
+    logging.info("Tabs formatted. Writing to file.")
 
     # Overwrite the initial unformatted tabs file
     with open(file_path, 'w', encoding='utf-8') as f: f.write("\n\n".join(formatted_blocks) + "\n")
-
+    logging.info("Writing formatted tabs file finished.")
 
 def midi_to_tabs(midi_path: str, tabs_folder: str = "./songs/tabs") -> Path:
     """
     Converts a guitar midi file to a text file with ASCII tabs and locates it in the tabs_folder
     :param midi_path: path to midi file
     :param tabs_folder: folder where tabs should be stored
-    :return: tabs text file path
+    :return: path to the newly generated tabs text file
     """
+    logging.info(f"Converting midi file {midi_path} to a formatted tabs file.")
     weights = {'b': 1, 'height': 1, 'length': 1, 'n_changed_strings': 1} # these values are provided in the setup of tuttut standard cli script
     midi = Path(midi_path)
     midi_data = pretty_midi.PrettyMIDI(midi.as_posix())
@@ -76,4 +80,5 @@ def midi_to_tabs(midi_path: str, tabs_folder: str = "./songs/tabs") -> Path:
     tab.to_ascii() #generates the tabs text file
     path_to_tabs = Path(tabs_folder) / f"{midi.stem}.txt"
     format_tabs_file(path_to_tabs, measures_per_row=2)
-    return path_to_tabs #returns the path to the newly generated tabs text file
+    logging.info(f"Tabs file saved in {path_to_tabs}.")
+    return path_to_tabs

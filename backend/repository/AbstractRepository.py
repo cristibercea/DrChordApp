@@ -1,7 +1,6 @@
 from typing import Optional
 from backend.domain.entities.Entity import Entity
 
-# TODO: Repository package logging!!!!!!
 class AbstractRepository:
     """
     Abstract Repository Class

@@ -4,6 +4,7 @@ from backend.domain.utils.validation.ValidationException import ValidationExcept
 
 
 class EmailValidator(AbstractValidator):
+    """Email Validator class"""
     def validate(self, email: str):
         logging.info(f"Validating Email: {email}")
         email = email.strip()

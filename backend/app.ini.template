@@ -21,3 +21,10 @@ starttls=<bool>         #COMMENT# if true, encrypts the connection after handsha
 ssl_tls=<bool>          #COMMENT# if false, the secure connection is not encrypted from the start of communication
 use_credentials=<bool>  #COMMENT# if true, it is mandatory for DrChord server to register to Google before each email
 validate_certs=<bool>   #COMMENT# if true, the smtp server certificates are verified by DrChord backend, before connection (avoids Man-in-the-Middle)
+
+[song_storage_config]
+#COMMENT# this is the basic songs files storage configuration on the server (this folder structure will be created by the FileService if not present on the server)
+base_songs_dir=songs
+recordings_dir=recordings
+midis_dir=midis
+tabs_dir=tabs

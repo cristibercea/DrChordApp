@@ -3,6 +3,7 @@ from backend.domain.entities.Entity import Entity
 
 
 class Song(Entity):
+    """The main Song entity class."""
     __id: int
     __user_id: int
     __name: str
