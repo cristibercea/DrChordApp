@@ -1,24 +1,25 @@
 import logging, sys, asyncio, random, numpy as np
-from datetime import datetime, timedelta
 from typing import Optional
+from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, Query, File, UploadFile, Form, BackgroundTasks
 from backend.domain.database.DrChordDatabase import DrChordDatabase
 from backend.repository.UserRepository import UserRepository
 from backend.repository.SongRepository import SongRepository
+from backend.service.utils.ConnectionManager import ws_manager
+from backend.service.InferenceService import InferenceService
+from backend.service.FileService import FileService
 from backend.service.UserService import UserService
 from backend.service.SongService import SongService
-from backend.service.utils.ConnectionManager import ws_manager
 from backend.service.utils.ServiceException import ServiceException
-from backend.requests.LoginRequest import LoginRequest
-from backend.requests.RegisterRequest import RegisterRequest
-from backend.requests.UpdateProfileRequest import UpdateProfileRequest
-from backend.requests.UpdateSongRequest import UpdateSongRequest
-from backend.requests.VerifyCodeRequest import VerifyCodeRequest
 from backend.utils.email_verification_helper import send_verification_code_email
 from backend.utils.security_helper import get_current_user_from_token, extract_user_from_header
-from service.FileService import FileService
+from backend.utils.requests.LoginRequest import LoginRequest
+from backend.utils.requests.RegisterRequest import RegisterRequest
+from backend.utils.requests.UpdateProfileRequest import UpdateProfileRequest
+from backend.utils.requests.UpdateSongRequest import UpdateSongRequest
+from backend.utils.requests.VerifyCodeRequest import VerifyCodeRequest
 
 np.seterr(divide="ignore")
 if sys.platform == 'win32': asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
@@ -28,14 +29,11 @@ logging.basicConfig(filename="target/backend.log",
                     datefmt='%d-%b-%y %H:%M:%S',
                     filemode='w')
 
-pending_registrations = {}
-db = DrChordDatabase("app.ini")
-user_repo = UserRepository(db)
-song_repo = SongRepository(db)
-file_service = FileService()
-user_service = UserService(user_repo)
-song_service = SongService(song_repo, file_service)
+__db = DrChordDatabase("app.ini")
+user_service = UserService(UserRepository(__db))
+song_service = SongService(SongRepository(__db), FileService(), InferenceService())
 app = FastAPI()
+# noinspection PyTypeChecker
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -44,10 +42,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# noinspection PyDeprecation
 @app.on_event("startup")
-async def startup(): db.create()
+async def startup(): __db.create()
+# noinspection PyDeprecation
 @app.on_event("shutdown")
-async def shutdown(): await db.disconnect()
+async def shutdown(): await __db.disconnect()
 
 @app.post("/auth/login")
 async def login(req: LoginRequest):
@@ -59,27 +60,27 @@ async def request_signup(user_data: RegisterRequest, background_tasks: Backgroun
     try:
         if await user_service.get_by_email(user_data.email): raise HTTPException(status_code=400, detail="Email already in use.")
         verification_code = str(random.randint(100000, 999999))
-        pending_registrations[user_data.email] = {
+        user_service.add_pending_user_registration(user_data.email, {
             "code": verification_code,
             "user_data": user_data,
             "expires_at": datetime.now() + timedelta(minutes=15) # 15 minutes until code expires
-        }
+        })
         background_tasks.add_task(send_verification_code_email, user_data.email, verification_code)
         return {"message": "Verification code sent! Please check your email."}
     except ServiceException as e: raise HTTPException(status_code=501, detail="Internal server error: " + str(e))
 
 @app.post("/auth/verify-and-register")
 async def verify_and_register(data: VerifyCodeRequest):
-    pending_user = pending_registrations.get(data.email)
-    if not pending_user: raise HTTPException(status_code=404, detail="There is no record for given email.")
-    if datetime.now() > pending_user["expires_at"]:
-        del pending_registrations[data.email]
+    pending_user_data = user_service.get_pending_user_registration(data.email)
+    if not pending_user_data: raise HTTPException(status_code=404, detail="There is no record for given email.")
+    if datetime.now() > pending_user_data["expires_at"]:
+        user_service.delete_pending_user_registration(data.email)
         raise HTTPException(status_code=400, detail="Code expired. Please redo the sign up process.")
-    if pending_user["code"] != data.code: raise HTTPException(status_code=400, detail="Invalid code.")
-    actual_user_data = pending_user["user_data"]
+    if pending_user_data["code"] != data.code: raise HTTPException(status_code=400, detail="Invalid code.")
+    actual_user_data = pending_user_data["user_data"]
     try:
         await user_service.register_user(actual_user_data.name, actual_user_data.email, actual_user_data.password)
-        del pending_registrations[data.email]
+        user_service.delete_pending_user_registration(data.email)
         return {"message": "Account verified successfully!"}
     except ServiceException as e: raise HTTPException(status_code=501, detail=str(e))
 

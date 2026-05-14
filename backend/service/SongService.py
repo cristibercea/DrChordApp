@@ -14,10 +14,10 @@ from repository.utils.RepositoyException import RepositoryException
 
 class SongService:
     """SongService class - responsible with managing song entities"""
-    def __init__(self, song_repo: SongRepository, file_service: FileService):
+    def __init__(self, song_repo: SongRepository, file_service: FileService, inference_service: InferenceService):
         self.__repo = song_repo
         self.__file_service = file_service
-        self.__inference_service = InferenceService()
+        self.__inference_service = inference_service
         self.__allowed_extensions = ["mp3", "wav", "ogg", "flac"]
         self.__mime_types = { # Newly downloaded tabs' MIME Types (headers) for the browser
             "pdf": "application/pdf",

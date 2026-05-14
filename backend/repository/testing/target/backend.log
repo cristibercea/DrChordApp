@@ -1,0 +1,62 @@
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id 1.
+14-May-26 13:56:35 - [INFO] - Validating User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.120634]
+14-May-26 13:56:35 - [INFO] - Validating Email: john@example.com
+14-May-26 13:56:35 - [INFO] - Valid Email: 'john@example.com'
+14-May-26 13:56:35 - [INFO] - Validating Name: John Doe
+14-May-26 13:56:35 - [INFO] - Valid Name: 'John Doe'
+14-May-26 13:56:35 - [INFO] - Valid User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.120634]
+14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id 1 is valid!
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [ERROR] - [UserRepository]: Unexpected error when creating user: Generic DB Failure
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id -1.
+14-May-26 13:56:35 - [INFO] - Validating User: User -1: [Name: Jane | Email: jane@mail.com | Registered in: 2026-05-14 13:56:35.136820]
+14-May-26 13:56:35 - [INFO] - Validating Email: jane@mail.com
+14-May-26 13:56:35 - [INFO] - Valid Email: 'jane@mail.com'
+14-May-26 13:56:35 - [INFO] - Validating Name: Jane
+14-May-26 13:56:35 - [INFO] - Valid Name: 'Jane'
+14-May-26 13:56:35 - [INFO] - Valid User: User -1: [Name: Jane | Email: jane@mail.com | Registered in: 2026-05-14 13:56:35.136820]
+14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id -1 is valid!
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Created user with id 1.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Failed to delete user with id 999.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Deleted user with id 1.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [ERROR] - [UserRepository]: Database error when getting user by email test@mail.com: Connection lost
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Returned user with email john@example.com.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Returned None.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Returned user with id 1.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id 1.
+14-May-26 13:56:35 - [INFO] - Validating User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.221639]
+14-May-26 13:56:35 - [INFO] - Validating Email: john@example.com
+14-May-26 13:56:35 - [INFO] - Valid Email: 'john@example.com'
+14-May-26 13:56:35 - [INFO] - Validating Name: John Doe
+14-May-26 13:56:35 - [INFO] - Valid Name: 'John Doe'
+14-May-26 13:56:35 - [INFO] - Valid User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.221639]
+14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id 1 is valid!
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Failed to update user with id 1.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id 1.
+14-May-26 13:56:35 - [INFO] - Validating User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.233317]
+14-May-26 13:56:35 - [INFO] - Validating Email: john@example.com
+14-May-26 13:56:35 - [INFO] - Valid Email: 'john@example.com'
+14-May-26 13:56:35 - [INFO] - Validating Name: John Doe
+14-May-26 13:56:35 - [INFO] - Valid Name: 'John Doe'
+14-May-26 13:56:35 - [INFO] - Valid User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.233317]
+14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id 1 is valid!
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
+14-May-26 13:56:35 - [INFO] - [UserRepository]: Updated user with id 1.

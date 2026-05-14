@@ -49,6 +49,32 @@ class UserService:
     """SongService class - responsible with managing user entities"""
     def __init__(self, user_repo: UserRepository):
         self.__repo = user_repo
+        self.__pending_user_registrations = {}
+
+    def get_pending_user_registration(self, user_email: str) -> dict | None:
+        """
+        Gets a pending user's registration data from the service temporary storage.
+        :param user_email: the email of the user whose registration to be retrieved
+        :return: the registration data if it exists
+        """
+        return self.__pending_user_registrations.get(user_email)
+
+    def add_pending_user_registration(self, user_email: str, registration_data: dict) -> None:
+        """
+        Adds a pending user's registration data to the service temporary storage.
+        :param user_email: the email of the user to be registered
+        :param registration_data: the data pending registration
+        :return: None
+        """
+        self.__pending_user_registrations[user_email] = registration_data
+
+    def delete_pending_user_registration(self, user_email: str) -> None:
+        """
+        Deletes a pending user's registration data from the service temporary storage.
+        :param user_email: the email of the user whose registration to be deleted
+        :return: None
+        """
+        del self.__pending_registrations[user_email]
 
     async def get_by_id(self, user_id: int) -> User | None:
         """
