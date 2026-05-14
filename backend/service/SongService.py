@@ -9,7 +9,7 @@ from backend.repository.SongRepository import SongRepository
 from backend.service.InferenceService import InferenceService
 from backend.service.utils.ConnectionManager import ws_manager
 from backend.service.utils.ServiceException import ServiceException
-from repository.utils.RepositoyException import RepositoryException
+from backend.repository.utils.RepositoyException import RepositoryException
 
 
 class SongService:

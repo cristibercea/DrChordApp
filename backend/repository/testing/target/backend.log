@@ -1,62 +1,62 @@
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id 1.
-14-May-26 13:56:35 - [INFO] - Validating User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.120634]
-14-May-26 13:56:35 - [INFO] - Validating Email: john@example.com
-14-May-26 13:56:35 - [INFO] - Valid Email: 'john@example.com'
-14-May-26 13:56:35 - [INFO] - Validating Name: John Doe
-14-May-26 13:56:35 - [INFO] - Valid Name: 'John Doe'
-14-May-26 13:56:35 - [INFO] - Valid User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.120634]
-14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id 1 is valid!
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [ERROR] - [UserRepository]: Unexpected error when creating user: Generic DB Failure
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id -1.
-14-May-26 13:56:35 - [INFO] - Validating User: User -1: [Name: Jane | Email: jane@mail.com | Registered in: 2026-05-14 13:56:35.136820]
-14-May-26 13:56:35 - [INFO] - Validating Email: jane@mail.com
-14-May-26 13:56:35 - [INFO] - Valid Email: 'jane@mail.com'
-14-May-26 13:56:35 - [INFO] - Validating Name: Jane
-14-May-26 13:56:35 - [INFO] - Valid Name: 'Jane'
-14-May-26 13:56:35 - [INFO] - Valid User: User -1: [Name: Jane | Email: jane@mail.com | Registered in: 2026-05-14 13:56:35.136820]
-14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id -1 is valid!
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Created user with id 1.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Failed to delete user with id 999.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Deleted user with id 1.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [ERROR] - [UserRepository]: Database error when getting user by email test@mail.com: Connection lost
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Returned user with email john@example.com.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Returned None.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to DrChord database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Returned user with id 1.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id 1.
-14-May-26 13:56:35 - [INFO] - Validating User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.221639]
-14-May-26 13:56:35 - [INFO] - Validating Email: john@example.com
-14-May-26 13:56:35 - [INFO] - Valid Email: 'john@example.com'
-14-May-26 13:56:35 - [INFO] - Validating Name: John Doe
-14-May-26 13:56:35 - [INFO] - Valid Name: 'John Doe'
-14-May-26 13:56:35 - [INFO] - Valid User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.221639]
-14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id 1 is valid!
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Failed to update user with id 1.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Validating User entity with id 1.
-14-May-26 13:56:35 - [INFO] - Validating User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.233317]
-14-May-26 13:56:35 - [INFO] - Validating Email: john@example.com
-14-May-26 13:56:35 - [INFO] - Valid Email: 'john@example.com'
-14-May-26 13:56:35 - [INFO] - Validating Name: John Doe
-14-May-26 13:56:35 - [INFO] - Valid Name: 'John Doe'
-14-May-26 13:56:35 - [INFO] - Valid User: User 1: [Name: John Doe | Email: john@example.com | Registered in: 2026-05-14 13:56:35.233317]
-14-May-26 13:56:35 - [INFO] - [UserRepository]: User entity with id 1 is valid!
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connecting to the DrChord Database...
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Connected to DrChord database.
-14-May-26 13:56:35 - [INFO] - [UserRepository]: Updated user with id 1.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Validating Song entity with id 1.
+14-May-26 15:46:57 - [INFO] - Validating Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.620368 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - Validating Name: My Song
+14-May-26 15:46:57 - [INFO] - Valid Name: 'My Song'
+14-May-26 15:46:57 - [INFO] - Validating Name: Rock
+14-May-26 15:46:57 - [INFO] - Valid Name: 'Rock'
+14-May-26 15:46:57 - [INFO] - Valid Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.620368 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Song entity with id 1 is valid!
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [ERROR] - [SongRepository]: Database error when creating song: Constraint Violation
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Validating Song entity with id 1.
+14-May-26 15:46:57 - [INFO] - Validating Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.634784 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - Validating Name: My Song
+14-May-26 15:46:57 - [INFO] - Valid Name: 'My Song'
+14-May-26 15:46:57 - [INFO] - Validating Name: Rock
+14-May-26 15:46:57 - [INFO] - Valid Name: 'Rock'
+14-May-26 15:46:57 - [INFO] - Valid Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.634784 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Song entity with id 1 is valid!
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Created song with id 1.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Failed to delete song with id 999.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Deleted song with id 1.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [ERROR] - [SongRepository]: Unexpected error when getting all songs: DB Crash
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Returned 2 songs for the user with id 5.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Returned None.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Returned the song with id 1.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Validating Song entity with id 1.
+14-May-26 15:46:57 - [INFO] - Validating Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.719958 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - Validating Name: My Song
+14-May-26 15:46:57 - [INFO] - Valid Name: 'My Song'
+14-May-26 15:46:57 - [INFO] - Validating Name: Rock
+14-May-26 15:46:57 - [INFO] - Valid Name: 'Rock'
+14-May-26 15:46:57 - [INFO] - Valid Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.719958 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Song entity with id 1 is valid!
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Failed to update song with id 1.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Validating Song entity with id 1.
+14-May-26 15:46:57 - [INFO] - Validating Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.732471 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - Validating Name: My Song
+14-May-26 15:46:57 - [INFO] - Valid Name: 'My Song'
+14-May-26 15:46:57 - [INFO] - Validating Name: Rock
+14-May-26 15:46:57 - [INFO] - Valid Name: 'Rock'
+14-May-26 15:46:57 - [INFO] - Valid Song: Song 1: [Name: My Song | Genre: Rock | Recorded on: 2026-05-14 15:46:57.732471 | MIDI Generated: no]
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Song entity with id 1 is valid!
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connecting to the DrChord Database...
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Connected to DrChord Database.
+14-May-26 15:46:57 - [INFO] - [SongRepository]: Updated song with id 1.

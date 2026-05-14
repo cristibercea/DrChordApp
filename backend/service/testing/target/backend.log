@@ -1,0 +1,7 @@
+14-May-26 16:54:46 - [INFO] - Converting midi file service/testing/data/test.mid to a formatted tabs file.
+14-May-26 16:54:49 - [INFO] - Reading tab file.
+14-May-26 16:54:49 - [INFO] - Processing tabs.
+14-May-26 16:54:49 - [INFO] - Tabs formatted. Writing to file.
+14-May-26 16:54:49 - [INFO] - Writing formatted tabs file finished.
+14-May-26 16:54:49 - [INFO] - Tabs file saved in service\testing\data\test.txt.
+14-May-26 16:54:49 - [INFO] - MIDI_TO_TABS_TEST: File converted to tabs in: service\testing\data\test.txt

@@ -31,19 +31,43 @@ class TestUserRepository(IsolatedAsyncioTestCase):
 
     # --- GET BY ID ---
     async def test_get_by_id_valid_blackbox(self):
+        """
+        Tests the get by id logic when getting a User object by a valid id.
+        """
+        # Arrange
         self.mock_conn.fetchrow.return_value = self.valid_user_row
+
+        # Act
         result = await self.repo.get_by_id(1)
+
+        # Arrange
         self.assertEqual(result.get_name(), "John Doe")
 
     async def test_get_by_id_invalid_blackbox(self):
+        """
+        Tests the get by id logic when getting a User object by an invalid id.
+        """
+        # Arrange
         self.mock_conn.fetchrow.return_value = None
+
+        # Act
         result = await self.repo.get_by_id(999)
+
+        # Arrange
         self.assertIsNone(result)
 
     # --- GET BY EMAIL ---
     async def test_get_by_email_valid_blackbox(self):
+        """
+        Tests the get by email logic when getting a User object by a valid email address.
+        """
+        # Arrange
         self.mock_conn.fetchrow.return_value = self.valid_user_row
+
+        # Act
         result = await self.repo.get_by_email("john@example.com")
+
+        # Assert
         self.assertEqual(result.get_id(), 1)
 
     async def test_get_by_email_invalid_greybox(self):
@@ -51,44 +75,91 @@ class TestUserRepository(IsolatedAsyncioTestCase):
         If the network fails, asyncpg raises PostgresError.
         Tests if repository catches this exception and raises it as a RepositoryException.
         """
+        # Arrange
         self.mock_conn.fetchrow.side_effect = asyncpg.PostgresError("Connection lost")
 
+        # Act & Assert
         with self.assertRaises(RepositoryException) as context:
             await self.repo.get_by_email("test@mail.com")
         self.assertIn("Database error", str(context.exception))
 
     # --- CREATE ---
     async def test_create_valid_blackbox(self):
+        """
+        Tests the creation of a valid Song object.
+        """
+        # Arrange
         self.mock_conn.fetchval.return_value = 1
         new_user = User(-1, "Jane", "jane@mail.com", "pwd", datetime.now())
+
+        # Act
         result = await self.repo.create(new_user)
+
+        # Arrange
         self.assertEqual(result.get_id(), 1)
 
     async def test_create_invalid_blackbox(self):
+        """
+        Tests the creation of a Song object, when the DB crashes.
+        """
+        # Arrange
         self.mock_conn.fetchval.side_effect = Exception("Generic DB Failure")
+
+        # Act & Assert
         with self.assertRaises(RepositoryException):
             await self.repo.create(self.valid_user_obj)
 
     # --- UPDATE ---
     async def test_update_valid_blackbox(self):
+        """
+        Tests the update logic when updating a valid User object.
+        """
+        # Arrange
         self.mock_conn.execute.return_value = "UPDATE 1"
+
+        # Act
         result = await self.repo.update(self.valid_user_obj)
+
+        # Assert Blackbox: got None because update was done successfully
         self.assertIsNone(result)
 
     async def test_update_invalid_greybox(self):
-        """ The execute() method returns an operation status string. If the id does not exist, it returns 'UPDATE 0'.
-        Tests if the internal logic treats this case correctly (return None). """
+        """
+        The execute() method returns an operation status string. If the id does not exist, it returns 'UPDATE 0'.
+        Tests if the internal logic treats this case correctly.
+        """
+        # Arrange
         self.mock_conn.execute.return_value = "UPDATE 0"
+
+        # Act
         result = await self.repo.update(self.valid_user_obj)
+
+        # Assert GreyBox: got a non-updated User object with email 'john@example.com'
         self.assertEqual(result.get_email(), "john@example.com")
 
     # --- DELETE ---
     async def test_delete_valid_blackbox(self):
+        """
+        Tests delete logic when deleting a valid and existing User object..
+        """
+        # Arrange
         self.mock_conn.fetchrow.return_value = self.valid_user_row
+
+        # Act
         result = await self.repo.delete(1)
+
+        # Assert BlackBox: got deleted User object with email 'john@example.com'
         self.assertEqual(result.get_email(), "john@example.com")
 
     async def test_delete_invalid_blackbox(self):
+        """
+        Tests delete behavior when deleting a nonexistent User.
+        """
+        # Arrange
         self.mock_conn.fetchrow.return_value = None
+
+        # Act
         result = await self.repo.delete(999)
+
+        # Assert BlackBox: got None because there is no User with id 999
         self.assertIsNone(result)
