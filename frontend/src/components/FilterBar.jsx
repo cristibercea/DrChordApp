@@ -1,7 +1,6 @@
 import { Box, TextField, MenuItem } from '@mui/material';
 
 export default function FilterBar({ filters, setFilters }) {
-  // Funcție generică pentru a actualiza orice câmp din filtru
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({...prevFilters, [name]: value,}));
@@ -18,7 +17,6 @@ export default function FilterBar({ filters, setFilters }) {
         width: '100%',
       }}
     >
-      {/* 1. Bara de căutare (Search by Name) */}
       <Box sx={{ width: { xs: '100%', md: '33%' } }}>
         <TextField
           fullWidth
@@ -31,7 +29,6 @@ export default function FilterBar({ filters, setFilters }) {
         />
       </Box>
 
-      {/* 2. Filtre și Ordonare */}
       <Box
         sx={{
           display: 'flex',
@@ -40,7 +37,6 @@ export default function FilterBar({ filters, setFilters }) {
           width: { xs: '100%', md: 'auto' },
         }}
       >
-        {/* Filtrare după Gen */}
         <TextField
           fullWidth
           size="small"
@@ -52,7 +48,6 @@ export default function FilterBar({ filters, setFilters }) {
           sx={{ minWidth: { sm: '150px' } }}
         />
 
-        {/* Filtrare după Status Tabulatură */}
         <TextField
           select
           fullWidth
@@ -69,7 +64,6 @@ export default function FilterBar({ filters, setFilters }) {
           <MenuItem value="no">Needs Transcription</MenuItem>
         </TextField>
 
-        {/* Sortare / Ordonare */}
         <TextField
           select
           fullWidth

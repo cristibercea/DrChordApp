@@ -23,13 +23,16 @@ export default function Navbar() {
       sx={{ borderBottom: 1, borderColor: 'grey.200', zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
       <Container maxWidth="lg">
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '64px' }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '150px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {/* Logo */}
             <Box component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
-              <Avatar variant="rounded" sx={{ bgcolor: 'primary.main', width: 32, height: 32, mr: 1, fontWeight: 'bold' }}>
-                DC
-              </Avatar>
+              <Box
+                component="img"
+                src="/drchord.svg"
+                alt="DrChord Logo"
+                sx={{ width: 70, height: 70, mr: 1.5, borderRadius: '6px' }}
+              />
               <Typography noWrap
                 variant="h6"
                 sx={{
@@ -41,21 +44,7 @@ export default function Navbar() {
               >DrChord</Typography>
             </Box>
 
-            {/* Links */}
-            <Box sx={{ display: { xs: 'none', sm: 'flex' }, height: '64px' }}>
-              <Button disableRipple component={RouterLink} to="/"
-                sx={{
-                  color: isHome ? 'primary.main' : 'text.secondary',
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontWeight: isHome ? 600 : 500,
-                  borderRadius: 0,
-                  borderBottom: isHome ? '2px solid' : '2px solid transparent',
-                  borderColor: isHome ? 'primary.main' : 'transparent',
-                  '&:hover': {backgroundColor: 'transparent', color: 'primary.main'}
-                }}
-              > My songs </Button>
-            </Box>
+
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
