@@ -107,3 +107,8 @@ amount of training data available for guitar, free of charge. The AMT model was 
 a great feat in the AMT domain because of the complexity and expresiveness of the guitar. That is the reason why the MIDIs and the tabs will be very rich in notes.
 It is considered that, for a guitarist, erasing unwanted or noise notes from MIDIs and tabs is much more feasible than adding missing key-notes by hand, because by adding
 notes, measures will change more and their complexity will grow, instead of shrinking.
+
+## Mentions
+The _test_audio.mp3_ and the _test.mid_ files are extracted from the [Classical Guitar Collection's](https://www.youtube.com/@ArtemRasskazov) guitar interpretation of a 
+piece, named _Song of the Ancients_, that belongs to the NieR Replicant (Gestalt) video game soundtrack, published by Square Enix. Link to the source YouTube video for these testing 
+samples (the samples taken start at exactly **1:28**): [Song of the Ancients](https://youtu.be/VAIGr5j_-w4). 

@@ -74,7 +74,7 @@ class UserService:
         :param user_email: the email of the user whose registration to be deleted
         :return: None
         """
-        del self.__pending_registrations[user_email]
+        del self.__pending_user_registrations[user_email]
 
     async def get_by_id(self, user_id: int) -> User | None:
         """

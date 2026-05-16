@@ -1,0 +1,122 @@
+### Global Variables for Tests
+@baseUrl = http://127.0.0.1:8000
+@email = licentacristi@gmail.com
+@password = StrongPassword
+
+### Request Signup
+POST {{baseUrl}}/auth/request-signup
+Content-Type: application/json
+
+{
+  "name": "DrChord Tester",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Verify and Create Account
+# Attention: You must check the FastAPI terminal logs (or email)
+# to grab the 6-digit code and replace it here.
+POST {{baseUrl}}/auth/verify-and-register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "code": "382374"
+}
+
+### Login (Automatically extracts and saves the JWT Token!)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+> {%
+    // This code runs AFTER PyCharm receives the response.
+    // It saves the JWT token to a global variable for later use.
+    client.test("Login successful", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("auth_token", response.body.token);
+%}
+
+
+### Get Profile Data
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{auth_token}}
+
+### Update Profile
+PUT {{baseUrl}}/users/me
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "DrChord Updated",
+  "current_password": "{{password}}",
+  "new_password": ""
+}
+
+### Upload a new song
+# multipart/form-data are used here. You must place a file named
+# test_audio.mp3 in the same directory as this .http file.
+POST {{baseUrl}}/songs
+Authorization: Bearer {{auth_token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Test Riff
+--WebAppBoundary
+Content-Disposition: form-data; name="genre"
+
+Rock
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="test_audio.mp3"
+Content-Type: audio/mpeg
+
+< ./test_audio.mp3
+--WebAppBoundary--
+
+> {%
+    // Save the newly created song ID for subsequent tests
+    if(response.status === 200) {
+        client.global.set("song_id", response.body.song.id);
+    }
+%}
+
+### Get user songs (Paged)
+GET {{baseUrl}}/songs?limit=10&offset=0
+Authorization: Bearer {{auth_token}}
+
+### Update song details
+PUT {{baseUrl}}/songs/{{song_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Awesome Riff",
+  "genre": "Jazz"
+}
+
+### Trigger background tab generation
+POST {{baseUrl}}/songs/{{song_id}}/generate-tab
+Authorization: Bearer {{auth_token}}
+
+### View Tab Data (JSON format)
+GET {{baseUrl}}/songs/{{song_id}}/tab
+Authorization: Bearer {{auth_token}}
+
+### Download Tab PDF
+GET {{baseUrl}}/songs/{{song_id}}/download?file_format=pdf
+Authorization: Bearer {{auth_token}}
+
+### Delete Song
+DELETE {{baseUrl}}/songs/{{song_id}}
+Authorization: Bearer {{auth_token}}
+
+### Delete Entire Account (Cascading delete)
+DELETE {{baseUrl}}/users/me
+Authorization: Bearer {{auth_token}}
