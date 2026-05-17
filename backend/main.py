@@ -53,7 +53,7 @@ async def shutdown(): await __db.disconnect()
 @app.post("/auth/login")
 async def login(req: LoginRequest):
     try: return await user_service.authenticate_user(req.email, req.password)
-    except ServiceException as e: raise HTTPException(status_code=401, detail=str(e))
+    except ServiceException as e: raise HTTPException(status_code=401, detail="Invalid email or password.")
 
 @app.post("/auth/request-signup")
 async def request_signup(user_data: RegisterRequest, background_tasks: BackgroundTasks):
